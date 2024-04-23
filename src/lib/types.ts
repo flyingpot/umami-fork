@@ -5,15 +5,12 @@ import {
   EVENT_TYPE,
   KAFKA_TOPIC,
   PERMISSIONS,
-  REPORT_FILTER_TYPES,
   REPORT_TYPES,
   ROLES,
-  TEAM_FILTER_TYPES,
-  USER_FILTER_TYPES,
-  WEBSITE_FILTER_TYPES,
 } from './constants';
 import * as yup from 'yup';
 import { TIME_UNIT } from './date';
+import { Dispatch, SetStateAction } from 'react';
 
 type ObjectValues<T> = T[keyof T];
 
@@ -27,50 +24,56 @@ export type DynamicDataType = ObjectValues<typeof DATA_TYPE>;
 export type KafkaTopic = ObjectValues<typeof KAFKA_TOPIC>;
 export type ReportType = ObjectValues<typeof REPORT_TYPES>;
 
-export type ReportSearchFilterType = ObjectValues<typeof REPORT_FILTER_TYPES>;
-export type UserSearchFilterType = ObjectValues<typeof USER_FILTER_TYPES>;
-export type WebsiteSearchFilterType = ObjectValues<typeof WEBSITE_FILTER_TYPES>;
-export type TeamSearchFilterType = ObjectValues<typeof TEAM_FILTER_TYPES>;
-
-export interface WebsiteSearchFilter extends SearchFilter<WebsiteSearchFilterType> {
+export interface WebsiteSearchFilter extends SearchFilter {
   userId?: string;
   teamId?: string;
   includeTeams?: boolean;
   onlyTeams?: boolean;
 }
 
-export interface UserSearchFilter extends SearchFilter<UserSearchFilterType> {
+export interface UserSearchFilter extends SearchFilter {
   teamId?: string;
 }
 
-export interface TeamSearchFilter extends SearchFilter<TeamSearchFilterType> {
+export interface TeamSearchFilter extends SearchFilter {
   userId?: string;
 }
 
-export interface ReportSearchFilter extends SearchFilter<ReportSearchFilterType> {
+export interface TeamUserSearchFilter extends SearchFilter {
+  teamId?: string;
+}
+
+export interface ReportSearchFilter extends SearchFilter {
   userId?: string;
   websiteId?: string;
-  includeTeams?: boolean;
 }
 
-export interface SearchFilter<T> {
-  filter?: string;
-  filterType?: T;
-  pageSize: number;
-  page: number;
+export interface SearchFilter {
+  query?: string;
+  page?: number;
+  pageSize?: number;
   orderBy?: string;
+  sortDescending?: boolean;
 }
 
 export interface FilterResult<T> {
   data: T;
   count: number;
-  pageSize: number;
   page: number;
+  pageSize: number;
   orderBy?: string;
+  sortDescending?: boolean;
+}
+
+export interface FilterQueryResult<T> {
+  result: FilterResult<T>;
+  query: any;
+  params: SearchFilter;
+  setParams: Dispatch<SetStateAction<T | SearchFilter>>;
 }
 
 export interface DynamicData {
-  [key: string]: number | string | DynamicData | number[] | string[] | DynamicData[];
+  [key: string]: number | string | number[] | string[];
 }
 
 export interface Auth {
@@ -184,11 +187,12 @@ export interface RealtimeUpdate {
 }
 
 export interface DateRange {
+  value: string;
   startDate: Date;
   endDate: Date;
-  value: string;
   unit?: TimeUnit;
-  selectedUnit?: TimeUnit;
+  num?: number;
+  offset?: number;
 }
 
 export interface QueryFilters {
@@ -209,9 +213,20 @@ export interface QueryFilters {
   city?: string;
   language?: string;
   event?: string;
+  search?: string;
 }
 
 export interface QueryOptions {
   joinSession?: boolean;
   columns?: { [key: string]: string };
+  limit?: number;
+}
+
+export interface RealtimeData {
+  pageviews: any[];
+  sessions: any[];
+  events: any[];
+  timestamp: number;
+  countries?: any[];
+  visitors?: any[];
 }

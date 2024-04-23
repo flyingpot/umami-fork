@@ -22,13 +22,11 @@ const schema = {
 
 export default async (
   req: NextApiRequestQueryBody<EventDataStatsRequestQuery>,
-  res: NextApiResponse<any>,
+  res: NextApiResponse,
 ) => {
   await useCors(req, res);
   await useAuth(req, res);
-
-  req.yup = schema;
-  await useValidate(req, res);
+  await useValidate(schema, req, res);
 
   if (req.method === 'GET') {
     const { websiteId, startAt, endAt } = req.query;
